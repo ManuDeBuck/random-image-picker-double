@@ -21,7 +21,7 @@ function loadImagesLeft() {
     }
     document.getElementById("imagesInputLeft").value = null;
 
-    pa.track({name: 'Load images left', value: IMAGES.length});
+    pa.track({name: 'Load images left', value: IMAGES_LEFT.length});
 }
 
 function loadImagesRight() {
@@ -42,11 +42,11 @@ function loadImagesRight() {
     }
     document.getElementById("imagesInputRight").value = null;
 
-    pa.track({name: 'Load images right', value: IMAGES.length});
+    pa.track({name: 'Load images right', value: IMAGES_RIGHT.length});
 }
 
 function pickRandomImage() {
-    pa.track({name: 'Pick random image', value: IMAGES.length});
+    pa.track({name: 'Pick random image', value: [IMAGES_LEFT.length, IMAGES_RIGHT.length]});
 
     $("#reset-button").prop("disabled", false);
     $("#pick-button").prop("disabled", true);
