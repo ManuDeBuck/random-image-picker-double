@@ -12,6 +12,7 @@ function loadImagesRight() {
 }
 
 function loadImages(side) {
+    $("#start-button").prop("disabled", false);
     $(`#images-title-${side}`).html(`Selected ${side}-side images`);
     $(`#random-image-div-${side}`).css("display", "none");
 
@@ -22,8 +23,8 @@ function loadImages(side) {
         oFReader.readAsDataURL(file);
 
         oFReader.onload = function (oFREvent) {
-            let data = images.html()
-            data += `<img alt="imagepicker.org carousel image" class="img-thumbnail thumbnail" src="${oFREvent.target.result}">`
+            let data = images.html();
+            data += `<img alt="imagepicker.org carousel image" class="img-thumbnail thumbnail" src="${oFREvent.target.result}">`;
             images.html(data);
             if (side === "right") {
                 IMAGES_RIGHT.push(oFREvent.target.result);
@@ -105,12 +106,12 @@ function computeDurations(steps) {
  * Some beautiful math to create a increasing-time effect in the carousel spin
  */
 function f(x, steps) {
-    sigm = 0;
+    let sigm = 0;
     for (let i = 1; i <= steps; i += 1) {
         sigm += Math.log(i);
     }
-    a = CAROUSEL_TIME / (steps * Math.log(steps) - sigm)
-    c = (CAROUSEL_TIME * Math.log(steps)) / (steps * Math.log(steps) - sigm);
+    const a = CAROUSEL_TIME / (steps * Math.log(steps) - sigm)
+    const c = (CAROUSEL_TIME * Math.log(steps)) / (steps * Math.log(steps) - sigm);
     return -a * Math.log(x) + c;
 }
 
@@ -171,4 +172,5 @@ function reset() {
         $(this).html("");
     });
     $("#reset-button").prop("disabled", true);
+    $("#start-button").prop("disabled", true);
 }
