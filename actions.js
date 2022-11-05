@@ -4,45 +4,37 @@ const ROUNDS = 1; // Amount of rounds the carousel will shift trough
 const CAROUSEL_TIME = 5; // Total time in seconds carousel will spin
 
 function loadImagesLeft() {
-    $("#imagesTitleLeft").html("Selected left-side images");
-    $("#random-image-div").css("display", "none");
-    const images = $("#imagesLeft");
-
-    for (let file of document.getElementById("imagesInputLeft").files) {
-        let oFReader = new FileReader();
-        oFReader.readAsDataURL(file);
-
-        oFReader.onload = function (oFREvent) {
-            data = images.html()
-            data += `<img alt="imagepicker.org carousel image" class="img-thumbnail thumbnail" src="${oFREvent.target.result}">`
-            images.html(data);
-            IMAGES_LEFT.push(oFREvent.target.result);
-        };
-    }
-    document.getElementById("imagesInputLeft").value = null;
-
-    pa.track({name: 'Load images left', value: IMAGES_LEFT.length});
+    loadImages("left");
 }
 
 function loadImagesRight() {
-    $("#imagesTitleRight").html("Selected right-side images");
-    $("#random-image-div").css("display", "none");
-    const images = $("#imagesRight");
+    loadImages("right");
+}
 
-    for (let file of document.getElementById("imagesInputRight").files) {
+function loadImages(side) {
+    $(`#images-title-${side}`).html(`Selected ${side}-side images`);
+    $(`#random-image-div-${side}`).css("display", "none");
+
+    const images = $(`#images-${side}`);
+
+    for (let file of document.getElementById(`images-input-${side}`).files) {
         let oFReader = new FileReader();
         oFReader.readAsDataURL(file);
 
         oFReader.onload = function (oFREvent) {
-            data = images.html()
+            let data = images.html()
             data += `<img alt="imagepicker.org carousel image" class="img-thumbnail thumbnail" src="${oFREvent.target.result}">`
             images.html(data);
-            IMAGES_RIGHT.push(oFREvent.target.result);
+            if (side === "right") {
+                IMAGES_RIGHT.push(oFREvent.target.result);
+            } else if (side === "left") {
+                IMAGES_LEFT.push(oFREvent.target.result);
+            }
         };
     }
-    document.getElementById("imagesInputRight").value = null;
+    document.getElementById(`images-input-${side}`).value = null;
 
-    pa.track({name: 'Load images right', value: IMAGES_RIGHT.length});
+    pa.track({name: `Load images ${side}`, value: side === "left" ? IMAGES_LEFT.length : IMAGES_RIGHT.length});
 }
 
 function pickRandomImage() {
@@ -93,7 +85,7 @@ function doCarouselRec(side, index, durations, deleteImage) {
         randomImage.removeClass("random-selected");
         const duration = durations.shift();
         setTimeout(function () {
-            doCarouselRec(side,index + 1, durations, deleteImage);
+            doCarouselRec(side, index + 1, durations, deleteImage);
         }, duration * 1000);
     } else {
         // Freeze and remove image from list
