@@ -1,69 +1,101 @@
-let IMAGES = []; // Will put all images in this
+let IMAGES_LEFT = [];
+let IMAGES_RIGHT = [];
 const ROUNDS = 1; // Amount of rounds the carousel will shift trough
 const CAROUSEL_TIME = 5; // Total time in seconds carousel will spin
 
-function loadImages() {
-    $("#yourimagestitle").html("Selected images");
+function loadImagesLeft() {
+    $("#imagesTitleLeft").html("Selected left-side images");
     $("#random-image-div").css("display", "none");
-    const images = $("#images");
+    const images = $("#imagesLeft");
 
-    for (let file of document.getElementById("imagesInput").files) {
+    for (let file of document.getElementById("imagesInputLeft").files) {
         let oFReader = new FileReader();
         oFReader.readAsDataURL(file);
 
         oFReader.onload = function (oFREvent) {
             data = images.html()
             data += `<img alt="imagepicker.org carousel image" class="img-thumbnail thumbnail" src="${oFREvent.target.result}">`
-            $("#images").html(data);
-            IMAGES.push(oFREvent.target.result);
+            images.html(data);
+            IMAGES_LEFT.push(oFREvent.target.result);
         };
     }
-    document.getElementById("imagesInput").value = null;
+    document.getElementById("imagesInputLeft").value = null;
 
-    pa.track({name: 'Load images', value: IMAGES.length});
+    // pa.track({name: 'Load images left', value: IMAGES.length});
+}
+
+function loadImagesRight() {
+    $("#imagesTitleRight").html("Selected right-side images");
+    $("#random-image-div").css("display", "none");
+    const images = $("#imagesRight");
+
+    for (let file of document.getElementById("imagesInputRight").files) {
+        let oFReader = new FileReader();
+        oFReader.readAsDataURL(file);
+
+        oFReader.onload = function (oFREvent) {
+            data = images.html()
+            data += `<img alt="imagepicker.org carousel image" class="img-thumbnail thumbnail" src="${oFREvent.target.result}">`
+            images.html(data);
+            IMAGES_RIGHT.push(oFREvent.target.result);
+        };
+    }
+    document.getElementById("imagesInputRight").value = null;
 }
 
 function pickRandomImage() {
+    // pa.track({name: 'Pick random image', value: IMAGES.length});
+
     $("#reset-button").prop("disabled", false);
     $("#pick-button").prop("disabled", true);
 
     const deleteImage = $("#delete-image")[0].checked;
     const directly = $("#show-directly")[0].checked;
 
-    if (!IMAGES.length) {
+    if (!IMAGES_RIGHT.length || !IMAGES_LEFT.length) {
         $("#information-text").html("No images left");
-        $("#random-image-div").css("display", "none");
+        $("#random-image-div-left").css("display", "none");
+        $("#random-image-div-right").css("display", "none");
     } else {
-        const selected = Math.floor(Math.random() * IMAGES.length); // Pick random image
+        const selectedLeft = Math.floor(Math.random() * IMAGES_LEFT.length); // Pick random image
+        const selectedRight = Math.floor(Math.random() * IMAGES_RIGHT.length); // Pick random image
         if (directly) {
-            setFinalImage(selected, deleteImage);
+            setFinalImage("left", selectedLeft, deleteImage);
+            setFinalImage("right", selectedRight, deleteImage);
         } else {
-            doCarousel(selected, deleteImage);
+            doCarousel("left", selectedLeft, deleteImage);
+            doCarousel("right", selectedRight, deleteImage);
         }
     }
 }
 
-function doCarousel(selected, deleteImage) {
-    pa.track({name: 'Do Carousel', value: IMAGES.length});
-    const totalCarousel = ROUNDS * IMAGES.length + selected; // Total images that will be shown in carousel
+function doCarousel(side, selected, deleteImage) {
+    let totalCarousel = 0; // Total images that will be shown in carousel
+    if (side === "left") {
+        totalCarousel = ROUNDS * IMAGES_LEFT.length + selected;
+    } else if (side === "right") {
+        totalCarousel = ROUNDS * IMAGES_RIGHT.length + selected;
+    }
     const durations = computeDurations(totalCarousel); // Compute a list of durations for each image display in the carousel
-    doCarouselRec(0, durations, deleteImage);
+    doCarouselRec(side, 0, durations, deleteImage);
 }
 
-function doCarouselRec(index, durations, deleteImage) {
-    index = index % IMAGES.length;
-    const randomImage = $("#random-image");
-    $("#random-image-div").css("display", "");
+function doCarouselRec(side, index, durations, deleteImage) {
+    const images = side === "left" ? IMAGES_LEFT : IMAGES_RIGHT;
+
+    index = index % images.length;
+    const randomImage = $(`#random-image-${side}`);
+    $(`#random-image-div-${side}`).css("display", "");
     if (durations.length > 0) {
-        randomImage.prop("src", IMAGES[index]);
+        randomImage.prop("src", images[index]);
         randomImage.removeClass("random-selected");
         const duration = durations.shift();
         setTimeout(function () {
-            doCarouselRec(index + 1, durations, deleteImage);
+            doCarouselRec(side,index + 1, durations, deleteImage);
         }, duration * 1000);
     } else {
         // Freeze and remove image from list
-        setFinalImage(index, deleteImage);
+        setFinalImage(side, index, deleteImage);
     }
 }
 
@@ -79,7 +111,6 @@ function computeDurations(steps) {
  * Some beautiful math to create a increasing-time effect in the carousel spin
  */
 function f(x, steps) {
-    const carousel_time = Math.min(CAROUSEL_TIME, IMAGES.length);
     sigm = 0;
     for (let i = 1; i <= steps; i += 1) {
         sigm += Math.log(i);
@@ -89,18 +120,24 @@ function f(x, steps) {
     return -a * Math.log(x) + c;
 }
 
-function deleteSelectedImage(index) {
-    IMAGES.splice(index, 1);
+function deleteSelectedImage(side, index) {
+    if (side === "left") {
+        IMAGES_LEFT.splice(index, 1);
+    } else if (side === "right") {
+        IMAGES_RIGHT.splice(index, 1);
+    }
 }
 
-function setFinalImage(index, deleteImage) {
-    let randomImage = $("#random-image");
+function setFinalImage(side, index, deleteImage) {
+    const images = side === "left" ? IMAGES_LEFT : IMAGES_RIGHT;
+
+    let randomImage = $(`#random-image-${side}`);
     $("#random-image-div").css("display", "");
-    randomImage.prop("src", IMAGES[index]);
+    randomImage.prop("src", images[index]);
     randomImage.addClass("random-selected");
     $("#pick-button").prop("disabled", false);
     if (deleteImage) {
-        deleteSelectedImage(index);
+        deleteSelectedImage(side, index);
     }
 }
 
@@ -115,11 +152,12 @@ function start() {
         $(this).html("");
     });
 
-    if (!IMAGES.length) {
+    if (IMAGES_LEFT.length === 0 || IMAGES_RIGHT.length === 0) {
         $("#information-text").html("No images left");
         $("#reset-button").prop("disabled", false);
         $("#pick-button").prop("disabled", true);
-        $("#random-image-div").css("display", "none");
+        $("#random-image-div-left").css("display", "none");
+        $("#random-image-div-right").css("display", "none");
     } else {
         $("#pick-button").prop("disabled", false);
         $("#reset-button").prop("disabled", true);
@@ -127,7 +165,8 @@ function start() {
 }
 
 function reset() {
-    IMAGES = [];
+    IMAGES_LEFT = [];
+    IMAGES_RIGHT = [];
     $(`#step-1`).each(function () {
         $(this).css("display", "");
     });

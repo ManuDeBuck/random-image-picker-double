@@ -9,7 +9,7 @@
           content="A Random Image Picker carousel. This web application picks/selects a random image from batch of images of choice. This web application also provides extra features such as a nice visual carousel which makes it more fun to use.">
     <meta name="author" content="Manu De Buck">
 
-    <title>Random Image Picker</title>
+    <title>Random Image Picker Double</title>
 
     <meta property="og:url" content="https://imagepicker.org"/>
     <meta property="og:type" content="website"/>
@@ -41,7 +41,7 @@
 <div class="page-content d-flex flex-column">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary static-top">
         <div class="container">
-            <a class="navbar-brand" href="https://imagepicker.org">Random Image Picker</a>
+            <a class="navbar-brand" href="https://imagepicker.org">Random Image Picker Double</a>
         </div>
     </nav>
 
@@ -51,12 +51,17 @@
                 <div class="col-12">
                     <h1 class="mt-3 mb-3">Select Images</h1>
                     <div class="col-12 row">
-                        <div class="input-group col-12 col-md-9">
-                            <input type="file" class="custom-file-input" id="imagesInput" multiple
-                                   onchange="loadImages();">
-                            <label class="custom-file-label" for="imagesInput">Select Images</label>
+                        <div class="input-group col-12">
+                            <input type="file" class="custom-file-input" id="imagesInputLeft" multiple
+                                   onchange="loadImagesLeft();">
+                            <label class="custom-file-label" for="imagesInputLeft">Select Images Left Side</label>
                         </div>
-                        <button type="button" class="btn btn-success col-12 col-md-2 ml-0 ml-md-1 mt-2 mt-md-0"
+                        <div class="input-group col-12 mt-2">
+                            <input type="file" class="custom-file-input" id="imagesInputRight" multiple
+                                   onchange="loadImagesRight();">
+                            <label class="custom-file-label" for="imagesInputRight">Select Images Right Side</label>
+                        </div>
+                        <button type="button" class="btn btn-success col-12 mt-2"
                                 onclick="start();">Next
                         </button>
                     </div>
@@ -64,26 +69,28 @@
                         <div class="custom-control custom-switch">
                             <input type="checkbox" class="custom-control-input" id="delete-image" checked="checked">
                             <label class="custom-control-label" for="delete-image">Remove image. If enabled the picked
-                                image will be removed from the batch of images, otherwise it won't.</label>
+                                images will be removed from the batch of images, otherwise it won't.</label>
                         </div>
                         <div class="custom-control custom-switch mt-2">
                             <input type="checkbox" class="custom-control-input" id="show-directly">
                             <label class="custom-control-label" for="show-directly">Show directly. If enabled no
-                                carousel animation will be shown and a random image will be picked directly.</label>
+                                carousel animation will be shown and random images will be picked directly.</label>
                         </div>
                     </div>
-                    <h1 class="mt-4 step-1-clear" id="yourimagestitle"></h1>
-                    <div id="images" class="step-1-clear"></div>
+                    <h1 class="mt-4 step-1-clear" id="imagesTitleLeft"></h1>
+                    <div id="imagesLeft" class="step-1-clear"></div>
+                    <h1 class="mt-4 step-1-clear" id="imagesTitleRight"></h1>
+                    <div id="imagesRight" class="step-1-clear"></div>
                 </div>
                 <div class="col-12">
                     <div class="my-4 card border-secondary text-secondary">
                         <h3 class="card-header">Information</h3>
                         <div class="card-body">
                             <h4>How does this application work?</h4>
-                            <p>This application picks a random image from a batch of images you select.</p>
+                            <p>This application picks two random images from two batches of images you selected.</p>
                             <p>To start, you can select images to by clicking 'Browse'. Once selected, a
                                 preview of all the images will be shown on this page.
-                                When clicking on 'Next', there will be the option to pick random images. You will be
+                                When clicking on 'Next', there will be an option to pick random images. You will be
                                 presented two buttons:</p>
 
                             <div class="my-4">
@@ -93,7 +100,7 @@
                                 </button>
                             </div>
 
-                            <p> The 'Pick Image' button will pick a random image from the batch you selected
+                            <p> The 'Pick Image' button will pick two random images from the batch you selected
                                 earlier. The 'Reset Images' button, will take you back to the previous page, where you
                                 can select new images.</p>
 
@@ -112,8 +119,8 @@
                                 contribute to this application.</p>
 
                             <h4>Want to support this app?</h4>
-			    <a href="https://www.buymeacoffee.com/manudebuck">Buy me a coffee</a>
-			</div>
+                            <a href="https://www.buymeacoffee.com/manudebuck">Buy me a coffee</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -122,17 +129,22 @@
         <div id="step-2" style="display: none;">
             <div class="row">
                 <div class="col-lg-12 mb-4 text-center">
-                    <h1 class="mt-3 mb-3">Random Image Picker</h1>
                     <p id="information-text" class="step-2-clear text-danger"></p>
                     <button id="pick-button" type="button" class="btn btn-success" onclick="pickRandomImage();">Pick
-                        Random
-                        Image
+                        Random Images
                     </button>
                     <button id="reset-button" type="button" class="btn btn-danger" onclick="reset();">Reset
                         Images
                     </button>
-                    <div id="random-image-div" class="h-55 mt-5">
-                        <img id="random-image" class="img-thumbnail random-image" src="">
+                    <div class="row mt-5">
+                        <div id="random-image-div-left" class="h-55 col-6">
+                            <img id="random-image-left" class="img-thumbnail random-image" src=""
+                                 alt="Randomly picked image at left side">
+                        </div>
+                        <div id="random-image-div-right" class="h-55 col-6">
+                            <img id="random-image-right" class="img-thumbnail random-image" src=""
+                                 alt="Randomly picked image at right side">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -142,7 +154,8 @@
 
     <footer class="sticky-footer py-4 bg-primary text-white-50">
         <div class="container text-center">
-            <small>Find the project on <a href="https://github.com/ManuDeBuck/random-image-picker/">GitHub</a>. Created
+            <small>Find the project on <a href="https://github.com/ManuDeBuck/random-image-picker-double/">GitHub</a>.
+                Created
                 by <a href="https://www.mdebuck.org">Manu De Buck</a>.</small>
         </div>
     </footer>
@@ -151,8 +164,8 @@
     <script src="vendor/jquery/jquery-3.4.1.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script type="text/Javascript" src="actions.js"></script>
-    <script data-host="https://microanalytics.io" data-dnt="false" src="vendor/microanalytics/script.js" id="ZwSg9rf6GA"
-            async defer></script>
+    <script data-host="https://microanalytics.io" data-dnt="false" src="https://microanalytics.io/js/script.js"
+            id="ZwSg9rf6GA" async defer></script>
 </div>
 </body>
 
