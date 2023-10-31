@@ -34,13 +34,9 @@ function loadImages(side) {
         };
     }
     document.getElementById(`images-input-${side}`).value = null;
-
-    pa.track({name: `Load images ${side}`, value: side === "left" ? IMAGES_LEFT.length : IMAGES_RIGHT.length});
 }
 
 function pickRandomImage() {
-    pa.track({name: 'Pick random image', value: [IMAGES_LEFT.length, IMAGES_RIGHT.length]});
-
     $("#reset-button").prop("disabled", false);
     $("#pick-button").prop("disabled", true);
 
