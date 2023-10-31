@@ -123,7 +123,7 @@ function setFinalImage(side, index, deleteImage) {
     const images = side === "left" ? IMAGES_LEFT : IMAGES_RIGHT;
 
     let randomImage = $(`#random-image-${side}`);
-    $("#random-image-div").css("display", "");
+    $(`#random-image-div-${side}`).css("display", "");
     randomImage.prop("src", images[index]);
     randomImage.addClass("random-selected");
     $("#pick-button").prop("disabled", false);
